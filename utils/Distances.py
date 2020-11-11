@@ -7,15 +7,15 @@ from sklearn.metrics import silhouette_samples
 
 def getdistances():
     seed = 1200
-    annotation_path = "../Data/data/reni/preprocessed_annotation_global.csv"
+    annotation_path = "../Data/data/kidney/preprocessed_annotation_global.csv"
     y = pd.read_csv(annotation_path)
     # y = pd.read_csv(annotation_path)["label"]
     # names = y.astype('category').cat.categories
     y = y['label'].astype('category').cat.codes
     modelname = " mlp "
-    meth_path = "../Data/data/reni/preprocessed_Matrix_meth.csv"
-    mRNA_path = "../Data/data/reni/preprocessed_Matrix_miRNA_deseq_correct.csv"
-    mRNA_normalized_path = "../Data/data/reni/preprocessed_Matrix_mRNA_deseq_normalized_prot_coding_correct.csv"
+    meth_path = "../Data/data/kidney/preprocessed_Matrix_meth.csv"
+    mRNA_path = "../Data/data/kidney/preprocessed_Matrix_miRNA_deseq_correct.csv"
+    mRNA_normalized_path = "../Data/data/kidney/preprocessed_Matrix_mRNA_deseq_normalized_prot_coding_correct.csv"
     files = [meth_path,  mRNA_normalized_path,mRNA_path]
     filenames = ["meth","mRNA", "miRNA"]
     parameters = {'hidden_layer_sizes': np.arange(start=100, stop=150, step=10), 'random_state': [seed],

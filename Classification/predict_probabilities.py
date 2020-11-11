@@ -15,12 +15,12 @@ import Classification.models as models
 
 seed = 1200
 # y
-annotation_path = "../Data/data/reni/preprocessed_annotation_global.csv"
+annotation_path = "../Data/data/kidney/preprocessed_annotation_global.csv"
 
 # filenames
-meth_path = "../Data/data/reni/Matrix_meth.csv"
-mRNA_path = "../Data/data/reni/Matrix_miRNA_deseq_correct.csv"
-mRNA_normalized_path = "../Data/data/reni/Matrix_mRNA_deseq_normalized_prot_coding_correct.csv"
+meth_path = "../Data/data/kidney/Matrix_meth.csv"
+mRNA_path = "../Data/data/kidney/Matrix_miRNA_deseq_correct.csv"
+mRNA_normalized_path = "../Data/data/kidney/Matrix_mRNA_deseq_normalized_prot_coding_correct.csv"
 y_stomaco = "../Data/data/stomach/preprocessed_annotation_global.csv"
 files = [meth_path, mRNA_normalized_path, mRNA_path]
 filenames = ["meth", "mRNA", "miRNA"]

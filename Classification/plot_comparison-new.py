@@ -6,7 +6,7 @@ import torch
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import classification_report
 from utils.Plot import plot_confusion_matrix
-annotation_path = "../Data/data/reni/preprocessed_annotation_global.csv"
+annotation_path = "../Data/data/kidney/preprocessed_annotation_global.csv"
 names = pd.read_csv(annotation_path)["label"].astype('category').cat.categories
 modelnames = [ "bnn","mlptree", "mlp"]
 filenames = ["miRNA", "meth", "mRNA"]

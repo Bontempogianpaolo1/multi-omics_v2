@@ -12,15 +12,15 @@ from utils.Plot import plot_confusion_matrix
 
 seed = 1200
 num_feature = 7
-annotation_path = "../../Data/data/reni/preprocessed_annotation_global.csv"
+annotation_path = "../../Data/data/kidney/preprocessed_annotation_global.csv"
 y = pd.read_csv(annotation_path)["label"]
 names = y.astype('category').cat.categories
 y = y.astype('category').cat.codes
 modelname = "random-forest"
 
-meth_path = "../../Data/data/reni/preprocessed_Matrix_meth.csv"
-mRNA_path = "../../Data/data/reni/preprocessed_Matrix_miRNA_deseq_correct.csv"
-mRNA_normalized_path = "../../Data/data/reni/preprocessed_Matrix_mRNA_deseq_normalized_prot_coding_correct.csv"
+meth_path = "../../Data/data/kidney/preprocessed_Matrix_meth.csv"
+mRNA_path = "../../Data/data/kidney/preprocessed_Matrix_miRNA_deseq_correct.csv"
+mRNA_normalized_path = "../../Data/data/kidney/preprocessed_Matrix_mRNA_deseq_normalized_prot_coding_correct.csv"
 files = [meth_path, mRNA_path, mRNA_normalized_path]
 filenames = ["meth", "miRNA", "mRNA"]
 parameters = {'criterion': ["gini", "entropy"], 'max_depth': [5, 10, 15], 'min_samples_split': [2, 4, 10]}
