@@ -284,11 +284,11 @@ def plot_diagram(df):
 
 def plot_outliers(X, y, X_train, title):
     # pca=PCA(n_components=3)
-    # X_train=pca.fit_transform(X_train)
+    # x_train=pca.fit_transform(x_train)
     # X=pca.transform(X)
     # X=pca.transform(X)
-    # X_train=pca.transform(X_train)
-    # X_train=X_train.to_numpy()
+    # x_train=pca.transform(x_train)
+    # x_train=x_train.to_numpy()
     colors = np.array(list(islice(cycle(['b', 'r', 'g', 'c', 'm', 'y', 'k']), 4)))
     markers = np.array(list(islice(cycle(['o', 'v', '^', '<', '>', '8', 's']), 4)))
     lista = [1, -1]
@@ -439,7 +439,7 @@ def plot_misclassified(intersection, y_pred, name, title):
         markers = np.array(list(islice(cycle(['o', 'v', '^', '<', '>', '8', 's']), 4)))
         lista = [1]
         # for l, c, m in zip(lista, colors, markers):
-        #    ax.scatter(X_train[:, 0], X_train[:, 1], X_train[:, 2], c=c, marker=m, label='train-set without outliers')
+        #    ax.scatter(x_train[:, 0], x_train[:, 1], x_train[:, 2], c=c, marker=m, label='train-set without outliers')
         ax.legend(loc='upper left', fontsize=12)
         plt.title(title2)
         plt.savefig("../Data/outputs/UMAP-2d-" + title2 + ".png")

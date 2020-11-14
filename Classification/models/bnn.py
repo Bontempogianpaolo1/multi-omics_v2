@@ -176,14 +176,14 @@ filenames = ["meth", "mrna", "micro mrna"]
 for file, filename in zip(files, filenames):
     with open('../Data/outputs/' + filename + '-bnn-output.txt', 'w') as f:
         X = pd.read_csv(file, index_col=False, header=None)
-        X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=seed, stratify=y)
+        x_train, x_test, y_train, y_test = train_test_split(X, y, random_state=seed, stratify=y)
         pca = PCA(n_components=num_features)
-        X_train_transformed = pca.fit_transform(X_train)
-        X_test_transformed = pca.transform(X_test)
+        x_train_transformed = pca.fit_transform(x_train)
+        x_test_transformed = pca.transform(x_test)
         clf = BNN(num_features, 20, 5)
-        clf.train_step(X_train_transformed, y_train)
+        clf.train_step(x_train_transformed, y_train)
         print('Prediction when network is forced to predict')
-        probabilities, true_labels = clf.test_forced(X_test_transformed, y_test)
+        probabilities, true_labels = clf.test_forced(x_test_transformed, y_test)
 
         import pandas as pd
 

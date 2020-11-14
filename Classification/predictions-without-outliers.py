@@ -61,7 +61,7 @@ for file, filename in zip(files, filenames):
     pca = PCA(n_components=n_components)
     X_train_transformed = pca.fit_transform(X_train)
     #pca=LinearDiscriminantAnalysis()
-    #X_train_transformed=pca.fit(X_train,y_train["label"])
+    #x_train_transformed=pca.fit(x_train,y_train["label"])
     X_test_transformed = pca.transform(X_test)
     X_transformed = pca.transform(X2)
     for model, modelname in zip(models, modelnames):
@@ -126,7 +126,7 @@ for file, filename in zip(files, filenames):
 
         if modelname == "bnn":
             # clf = bnn.BNN(n_components, 20, 5)
-            # clf.train_step(X_train_transformed, y_train)
+            # clf.train_step(x_train_transformed, y_train)
             tot, correct_predictions, predicted_for_images, new_prediction, probabilities = clf.test_batch(
                 torch.from_numpy(X_transformed).float(), y2, names, plot=False)
             y_pred = new_prediction
@@ -134,7 +134,7 @@ for file, filename in zip(files, filenames):
 
         elif modelname == "mlp":
             # clf = mlp.MLP(n_components, 20, 5)
-            # clf.train_step(X_train_transformed, y_train)
+            # clf.train_step(x_train_transformed, y_train)
             probabilities, true_labels = clf.test_forced(X_transformed, y2)
             y_pred = np.argmax(probabilities, axis=1)
             maxprob = np.max(probabilities, axis=1)
@@ -142,7 +142,7 @@ for file, filename in zip(files, filenames):
 
         elif modelname == "mlptree":
             # clf = mlptree.MlpTree(n_components, 20, 5)
-            # clf.train_step(X_train_transformed, y_train)
+            # clf.train_step(x_train_transformed, y_train)
             maxprob, y_pred, true_labels,probabilities = clf.test_forced(X_transformed, y2)
             #maxprob = probabilities
             y_pred[maxprob < 0] = 5

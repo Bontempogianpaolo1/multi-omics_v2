@@ -32,7 +32,7 @@ def getdistances():
 
         X_train_transformed = pca.fit_transform(X_train)
         sample_silhouette_values = silhouette_samples(X_train_transformed, y_train)
-        #X_train_transformed = X_train
+        #x_train_transformed = x_train
         weigths = []
         for n_cluster in range(5):
             cluster_avg= sample_silhouette_values[y_train==n_cluster].mean()

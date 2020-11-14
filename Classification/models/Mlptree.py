@@ -106,13 +106,13 @@ for file, filename in zip(files, filenames):
         X = pd.read_csv(file, index_col=False, header=None)
         if filename == "mrna":
             X = pd.DataFrame(X[X.std().sort_values(ascending=False).head(1200).index].values.tolist())
-        X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=seed)
+        x_train, x_test, y_train, y_test = train_test_split(X, y, random_state=seed)
         pca = PCA(n_components=num_features)
-        X_train_transformed = pca.fit_transform(X_train)
-        X_test_transformed = pca.transform(X_test)
+        x_train_transformed = pca.fit_transform(x_train)
+        x_test_transformed = pca.transform(x_test)
         clf = MlpTree(num_features, 20, 5)
-        clf.train_step(X_train_transformed, y_train)
-        probabilities, true_labels = clf.test_forced(X_test_transformed, y_test)
+        clf.train_step(x_train_transformed, y_train)
+        probabilities, true_labels = clf.test_forced(x_test_transformed, y_test)
         print(filename)
 
         pd.DataFrame(probabilities).to_csv("../Data/outputs/pred-mlp-" + filename + ".csv")

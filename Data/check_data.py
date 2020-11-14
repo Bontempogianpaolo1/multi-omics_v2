@@ -17,7 +17,7 @@ root="./original"
 for directory in listdir(root):
     for filename in listdir(root+"/"+directory):
         path=root+"/"+directory+"/"+filename
-        file = pd.read_csv(path)
+        file = pd.read_csv(path,sep="\t")
         print(path)
         print(file.shape)
 
