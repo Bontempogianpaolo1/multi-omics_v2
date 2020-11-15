@@ -13,7 +13,7 @@ names = pd.read_csv(annotation_path)["label"].astype('category').cat.categories
 modelnames = ["bnn", "mlptree", "mlp"]
 filenames = ["miRNA", "meth", "mRNA"]
 #testset
-path = "../Data/outputs/pred(-out)-testset-"
+path = "../Data/outputs2/pred(-out)-testset-"
 counters = torch.Tensor().new_zeros((228))
 for modelname in modelnames:
     data = []
@@ -74,8 +74,8 @@ for modelname in modelnames:
     #          multi_y_pred=y_pred2[y_true2.to_numpy() != y_pred2.numpy()],
     #          multi_y_true=y_true2[y_true2.to_numpy() != y_pred2.numpy()])
 
-path="../Data/outputs/pred-stomaco-"
-with open("../Data/outputs/counters-testset.txt", 'w') as f:
+path= "../Data/outputs2/pred-stomaco-"
+with open("../Data/outputs2/counters-testset.txt", 'w') as f:
     print("total unknown" + str((counters!=0).sum()),file=f)
     print("unknown for one model" + str((counters == 1).sum()), file=f)
     print("unknown for two models" + str((counters == 2).sum()), file=f)
@@ -112,7 +112,7 @@ for modelname in modelnames:
 
     plot_confusion_matrix(cnf_matrix,
                           title="with-unknown-stomaco-" + modelname + "-comparison-new",classes=["predicted","Unknown"])
-with open("../Data/outputs/counters-stomaco.txt", 'w') as f:
+with open("../Data/outputs2/counters-stomaco.txt", 'w') as f:
     print("total unknown" + str((counters!=0).sum()),file=f)
     print("unknown for one model" + str((counters == 1).sum()), file=f)
     print("unknown for two models" + str((counters == 2).sum()), file=f)

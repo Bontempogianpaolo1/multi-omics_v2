@@ -4,16 +4,13 @@ import pandas as pd
 import torch
 from imblearn.over_sampling import SMOTE
 from sklearn.decomposition import PCA
-from sklearn.metrics import accuracy_score
 from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
-
-import Classification.models as models
-import Classification.models.Mlp as Mlp
-import Classification.models.Mlptree as Mlptree
-import Classification.models.bnn as bnn
 from utils.Plot import PlotInstograms
 from utils.Plot import plot_confusion_matrix
+from Classification.models.Mlptree import MlpTree
+from Classification.models.Mlp import MLP
+from Classification.models.bnn import BNN
 
 
 def prepare_data(x_train, x_test, y_train, y_test, n_components, names):
@@ -41,17 +38,17 @@ def prepare_data(x_train, x_test, y_train, y_test, n_components, names):
     pca = PCA(n_components=n_components)
     x_train_transformed = pca.fit_transform(x_train)
     x_test_transformed = pca.transform(x_test)
-    return x_train_transformed, y_train, x_test_transformed, y_test,pca
+    return x_train_transformed, y_train, x_test_transformed, y_test, pca
 
 
-def train_and_test(x_train_transformed, y_train, x_test_transformed, y_test, n_components, names):
-    models = []
+def train_and_test(x_train_transformed, y_train, x_test_transformed, y_test, n_components, names,outputname):
+    models2 = []
     modelnames = ["mlptree", "mlp", "bnn"]
-    for model, modelname in modelnames:
-        scores = np.empty([])
+    for modelname in modelnames:
+
         # train and test bnn
         if modelname == "bnn":
-            clf = models.bnn.BNN(n_components, 20, 5)
+            clf = BNN(n_components, 20, 5)
             clf.train_step(x_train_transformed, y_train)
             tot, correct_predictions, predicted_for_images, new_prediction, probabilities = clf.test_batch(
                 torch.from_numpy(x_test_transformed).float(), y_test, names, plot=False)
@@ -60,7 +57,7 @@ def train_and_test(x_train_transformed, y_train, x_test_transformed, y_test, n_c
 
         elif modelname == "mlp":
             # train and test mlp
-            clf = models.Mlp.MLP(n_components, 20, 5)
+            clf = MLP(n_components, 20, 5)
             clf.train_step(x_train_transformed, y_train)
             probabilities, true_labels = clf.test_forced(x_test_transformed, y_test)
             y_pred = np.argmax(probabilities, axis=1)
@@ -69,7 +66,7 @@ def train_and_test(x_train_transformed, y_train, x_test_transformed, y_test, n_c
 
         elif modelname == "mlptree":
             # train and test mlptree
-            clf = models.Mlptree.MlpTree(n_components, 20, 5)
+            clf = MlpTree(n_components, 20, 5)
             clf.train_step(x_train_transformed, y_train)
             maxprob, y_pred, true_labels, probabilities = clf.test_forced(x_test_transformed, y_test)
             y_pred[maxprob < 0.9] = 5
@@ -84,12 +81,12 @@ def train_and_test(x_train_transformed, y_train, x_test_transformed, y_test, n_c
             'y_pred': y_pred.tolist(),
             'y_true': y_test["label"].astype('category').cat.codes.tolist()
         })
-        df.to_csv("../Data/outputs/pred-testset-" + modelname + "-" + "-onlyonedataset.csv")
+        df.to_csv("../Data/outputs/pred-"+outputname+"-"+ modelname + "" + ".csv")
         PlotInstograms(df, "istogramma testset unico dataset " + modelname)
 
         # save outliers name
         outliers_names = y_test[y_pred == 5]['official_name']
-        outliers_names.to_csv("../Data/outputs/outliers-testset-" + modelname + "-onlyonedataset.csv", index=False)
+        outliers_names.to_csv("../Data/outputs/outliers-"+outputname+"-" + modelname + ".csv", index=False)
 
         # print("final score : %f" % totalscore)
         print("plot")
@@ -102,15 +99,15 @@ def train_and_test(x_train_transformed, y_train, x_test_transformed, y_test, n_c
         plt.figure.Figure(figsize=(10, 10))
 
         plot_confusion_matrix(cnf_matrix,
-                              title="with-unknown-testset-" + modelname + "--onlyonedataset",
+                              title="with-unknown-"+outputname+"-"+ modelname + "",
                               classes=names.append(pd.Index(["Unknown"])))
-        with open("../Data/outputs/with-unknown-testset-" + modelname + "-" + "-onlyonedataset.txt", 'w') as f:
+        with open("../Data/outputs/"+outputname+"-" + modelname + "-" + ".txt", 'w') as f:
             print(classification_report(y_test['label'].astype('category').cat.codes, y_pred, ), file=f)
-        models.append(clf)
-    return models, modelnames
+        models2.append(clf)
+    return models2, modelnames
 
 
-def test(x_transformed, y2, models, modelnames, names):
+def test(x_transformed, y2, models, modelnames, names, outputname):
     for clf, modelname in zip(models, modelnames):
         if modelname == "bnn":
             # test bnn on stomach
@@ -141,11 +138,11 @@ def test(x_transformed, y2, models, modelnames, names):
             'y_pred': y_pred.tolist(),
             'y_true': y2["label"].astype('category').cat.codes.tolist()
         })
-        PlotInstograms(df, "istogramma stomaco unico dataset " + modelname)
-        df.to_csv("../Data/outputs/pred-stomaco-" + modelname + "-" + "-onlyonedataset.csv")
+        PlotInstograms(df, "istogramma" + outputname + "-" + modelname)
+        df.to_csv("../Data/outputs/pred-" + outputname + "-" + modelname + "" + ".csv")
         outliers_names = y2[y_pred == 5]['official_name']
         print(outliers_names)
-        outliers_names.to_csv("../Data/outputs/outliers-stomaco-" + modelname + "-" + "-onlyonedataset.csv",
+        outliers_names.to_csv("../Data/outputs/outliers-name-"+outputname+"-" + modelname + "" + ".csv",
                               index=False)
         y_pred = y_pred.astype(np.float)
         y_true = y2['label'].astype('category').cat.codes
@@ -163,8 +160,8 @@ def test(x_transformed, y2, models, modelnames, names):
         plt.figure.Figure(figsize=(10, 10))
 
         plot_confusion_matrix(cnf_matrix,
-                              title="with-unknown-stomaco-" + modelname + "--onlyonedataset",
+                              title=""+outputname+"-" + modelname + "",
                               classes=["predicted", "unknown"])
 
-        with open("../Data/outputs/with-unknown-stomaco-" + modelname + "-" + "-onlyonedataset.txt", 'w') as f:
+        with open("../Data/outputs/"+outputname+"-" + modelname + "-" + ".txt", 'w') as f:
             print(classification_report(y2['label'].astype('category').cat.codes, y_pred, ), file=f)

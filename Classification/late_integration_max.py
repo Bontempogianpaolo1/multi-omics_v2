@@ -9,7 +9,7 @@ names = pd.read_csv(annotation_path)["label"].astype('category').cat.categories
 modelnames = [ "bnn","mlptree", "mlp"]
 filenames = ["miRNA", "meth", "mRNA"]
 #testset
-path="../Data/outputs/pred-testset-"
+path= "../Data/outputs2/pred-testset-"
 for modelname in modelnames:
     data=[]
     for filename in filenames:
@@ -51,7 +51,7 @@ for modelname in modelnames:
 
         print(classification_report(comparisons[:,2].astype(np.float), comparisons[:,1].astype(np.float), ), file=f)
 
-path="../Data/outputs/pred-stomaco-"
+path= "../Data/outputs2/pred-stomaco-"
 for modelname in modelnames:
     data=[]
     for filename in filenames:

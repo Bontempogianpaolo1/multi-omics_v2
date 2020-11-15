@@ -8,9 +8,7 @@ import pandas as pd
 import utils.custom_dataset
 from sklearn.decomposition import PCA
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
-from Classification.Plot_mlp_results import plot_mlp_results
 import matplotlib as plt
 from utils.Plot import plot_confusion_matrix
 class MLP(nn.Module):
@@ -27,7 +25,7 @@ class MLP(nn.Module):
         self.out.bias = torch.nn.Parameter(torch.rand(self.out.bias.shape,generator=torch.manual_seed(1)))
         self.soft = nn.Softmax()
         self.optimizer = optim.Adam(self.parameters())
-        self.num_iterations = 1000
+        self.num_iterations = 200
         self.num_features = input_size
 
     def forward(self, x):
@@ -162,4 +160,4 @@ if __name__ == "__main__":
             plot_confusion_matrix(cnf_matrix,
                                   title=modelname + "-anomalies-" + filename,
                                   classes=names)
-    plot_mlp_results()
+    #plot_mlp_results()
