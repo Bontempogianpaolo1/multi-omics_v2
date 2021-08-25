@@ -4,7 +4,7 @@ from sklearn.model_selection import train_test_split
 from Classification.train_models import prepare_data
 from Classification.train_models import test
 from Classification.train_models import train_and_test
-
+from sklearn.model_selection import StratifiedShuffleSplit
 seed = 1200
 # y
 annotation_path = "../Data/data/kidney/annotation_global.csv"

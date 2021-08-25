@@ -6,18 +6,19 @@ import pandas as pd
 import torch
 from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
+from utils.Plot import PlotInstograms
 
 from utils.Plot import plot_confusion_matrix
-outputpath = "../Data/outputs/"
+outputpath = "../Data/outputs3/"
 annotation_path = "../Data/data/kidney/annotation_global.csv"
 names = pd.read_csv(annotation_path)["label"].astype('category').cat.categories
-modelnames = ["bnn", "mlptree", "mlp"]
+modelnames = ["bnn", "mlptree", "mlp","rotationForest"]
 filenames = ["miRNA", "meth", "mRNA"]
 datasets = ["kidney", "stomach", "lung"]
 conservative = [True, False]
 # testset
 for dataset in datasets:
-    path = "../Data/outputs2/pred-late-"
+    path = "../Data/outputs3/pred-late-"
     if dataset == "kidney":
         for modelname in modelnames:
             data = []
@@ -51,7 +52,8 @@ for dataset in datasets:
                     print("total predicted as unknown " + str((y_pred.numpy() == 5).sum()), file=f)
                     y_true2 = y_true[y_pred.numpy() != 5]
                     y_pred2 = y_pred[y_pred.numpy() != 5]
-                    print(classification_report(y_true2, y_pred2, ), file=f)
+                    if y_pred2.shape[0] != 0:
+                        print(classification_report(y_true2, y_pred2, ), file=f)
     else:
         for modelname in modelnames:
             data = []
@@ -71,9 +73,15 @@ for dataset in datasets:
                     constraint = torch.div(matrix.sum(2), matrix.sum(2).sum(1).view(y_pred.shape[0], 1))
                     max_prob = torch.max(matrix.sum(2), dim=1)
                     max_constraint = torch.max(constraint, dim=1)
-                    y_pred[(max_prob.values / 3 < 0.9) | (max_constraint.values < 0.25)] = 5
+                    y_pred[(max_prob.values / 3 < 0.7) | (max_constraint.values < 0.25)] = 5
+                    df = pd.DataFrame({
+                        'max_probability': max_prob.values,
+                    })
+                    PlotInstograms(df,"istogramma finale"+ modelname+dataset)
+
                 else:
                     pathto ="/last_step-notconservative-"+dataset+"-"+modelname
+
 
                 y_true[y_true != 5] = 0
                 y_true[y_true == 5] = 1
