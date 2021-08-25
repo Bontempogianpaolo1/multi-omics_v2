@@ -1,16 +1,21 @@
+import time
+
 import matplotlib as plt
 import numpy as np
 import pandas as pd
 import torch
 from imblearn.over_sampling import SMOTE
 from sklearn.decomposition import PCA
+from sklearn.decomposition import FastICA
 from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
+
+from Classification.models.Mlp import MLP
+from Classification.models.Mlptree import MlpTree
+from Classification.models.bnn import BNN
+from Classification.models.rotationForest import RotationForest
 from utils.Plot import PlotInstograms
 from utils.Plot import plot_confusion_matrix
-from Classification.models.Mlptree import MlpTree
-from Classification.models.Mlp import MLP
-from Classification.models.bnn import BNN
 
 
 def prepare_data(x_train, x_test, y_train, y_test, n_components, names):
@@ -35,21 +40,23 @@ def prepare_data(x_train, x_test, y_train, y_test, n_components, names):
             x_train = x_train.append(x_cur)
 
     # -------------------------------------------------------------------------------
-    pca = PCA(n_components=n_components)
+    #pca = PCA(n_components=n_components)
+    pca= FastICA(n_components=n_components)
     x_train_transformed = pca.fit_transform(x_train)
     x_test_transformed = pca.transform(x_test)
     return x_train_transformed, y_train, x_test_transformed, y_test, pca
 
 
-def train_and_test(x_train_transformed, y_train, x_test_transformed, y_test, n_components, names,outputname):
+def train_and_test(x_train_transformed, y_train, x_test_transformed, y_test, n_components, names, outputname):
     models2 = []
-    modelnames = ["mlptree", "mlp", "bnn"]
+    modelnames = ["rotationForest", "mlptree", "mlp", "bnn"]
     for modelname in modelnames:
-
+        start = time.time()
         # train and test bnn
         if modelname == "bnn":
             clf = BNN(n_components, 20, 5)
             clf.train_step(x_train_transformed, y_train)
+            end = time.time()
             tot, correct_predictions, predicted_for_images, new_prediction, probabilities = clf.test_batch(
                 torch.from_numpy(x_test_transformed).float(), y_test, names, plot=False)
             y_pred = new_prediction
@@ -59,6 +66,17 @@ def train_and_test(x_train_transformed, y_train, x_test_transformed, y_test, n_c
             # train and test mlp
             clf = MLP(n_components, 20, 5)
             clf.train_step(x_train_transformed, y_train)
+            end = time.time()
+            probabilities, true_labels = clf.test_forced(x_test_transformed, y_test)
+            y_pred = np.argmax(probabilities, axis=1)
+            maxprob = np.max(probabilities, axis=1)
+            y_pred[maxprob < 0.9] = 5
+
+        elif modelname == "rotationForest":
+            # train and test mlp
+            clf = RotationForest()
+            clf.train_step(x_train_transformed, y_train)
+            end = time.time()
             probabilities, true_labels = clf.test_forced(x_test_transformed, y_test)
             y_pred = np.argmax(probabilities, axis=1)
             maxprob = np.max(probabilities, axis=1)
@@ -68,6 +86,7 @@ def train_and_test(x_train_transformed, y_train, x_test_transformed, y_test, n_c
             # train and test mlptree
             clf = MlpTree(n_components, 20, 5)
             clf.train_step(x_train_transformed, y_train)
+            end = time.time()
             maxprob, y_pred, true_labels, probabilities = clf.test_forced(x_test_transformed, y_test)
             y_pred[maxprob < 0.9] = 5
         else:
@@ -81,12 +100,14 @@ def train_and_test(x_train_transformed, y_train, x_test_transformed, y_test, n_c
             'y_pred': y_pred.tolist(),
             'y_true': y_test["label"].astype('category').cat.codes.tolist()
         })
-        df.to_csv("../Data/outputs/pred-"+outputname+"-"+ modelname + "" + ".csv")
-        PlotInstograms(df, "istogramma testset unico dataset " + modelname)
+
+        print("time computation for " + modelname + "is " + str(end - start))
+        df.to_csv("../Data/outputs3/pred-" + outputname + "-" + modelname + "" + ".csv")
+        PlotInstograms(df, "istogramma" + outputname + "-" + modelname)
 
         # save outliers name
         outliers_names = y_test[y_pred == 5]['official_name']
-        outliers_names.to_csv("../Data/outputs/outliers-"+outputname+"-" + modelname + ".csv", index=False)
+        outliers_names.to_csv("../Data/outputs3/outliers-" + outputname + "-" + modelname + ".csv", index=False)
 
         # print("final score : %f" % totalscore)
         print("plot")
@@ -99,9 +120,9 @@ def train_and_test(x_train_transformed, y_train, x_test_transformed, y_test, n_c
         plt.figure.Figure(figsize=(10, 10))
 
         plot_confusion_matrix(cnf_matrix,
-                              title="with-unknown-"+outputname+"-"+ modelname + "",
+                              title="with-unknown-" + outputname + "-" + modelname + "",
                               classes=names.append(pd.Index(["Unknown"])))
-        with open("../Data/outputs/"+outputname+"-" + modelname + "-" + ".txt", 'w') as f:
+        with open("../Data/outputs3/" + outputname + "-" + modelname + "-" + ".txt", 'w') as f:
             print(classification_report(y_test['label'].astype('category').cat.codes, y_pred, ), file=f)
         models2.append(clf)
     return models2, modelnames
@@ -117,6 +138,13 @@ def test(x_transformed, y2, models, modelnames, names, outputname):
             maxprob = np.max(probabilities, axis=1)
 
         elif modelname == "mlp":
+            # test bnn on stomach
+            probabilities, true_labels = clf.test_forced(x_transformed, y2)
+            y_pred = np.argmax(probabilities, axis=1)
+            maxprob = np.max(probabilities, axis=1)
+            y_pred[maxprob < 0.9] = 5
+
+        elif modelname == "rotationForest":
             # test bnn on stomach
             probabilities, true_labels = clf.test_forced(x_transformed, y2)
             y_pred = np.argmax(probabilities, axis=1)
@@ -139,10 +167,10 @@ def test(x_transformed, y2, models, modelnames, names, outputname):
             'y_true': y2["label"].astype('category').cat.codes.tolist()
         })
         PlotInstograms(df, "istogramma" + outputname + "-" + modelname)
-        df.to_csv("../Data/outputs/pred-" + outputname + "-" + modelname + "" + ".csv")
+        df.to_csv("../Data/outputs3/pred-" + outputname + "-" + modelname + "" + ".csv")
         outliers_names = y2[y_pred == 5]['official_name']
         print(outliers_names)
-        outliers_names.to_csv("../Data/outputs/outliers-name-"+outputname+"-" + modelname + "" + ".csv",
+        outliers_names.to_csv("../Data/outputs3/outliers-name-" + outputname + "-" + modelname + "" + ".csv",
                               index=False)
         y_pred = y_pred.astype(np.float)
         y_true = y2['label'].astype('category').cat.codes
@@ -160,8 +188,8 @@ def test(x_transformed, y2, models, modelnames, names, outputname):
         plt.figure.Figure(figsize=(10, 10))
 
         plot_confusion_matrix(cnf_matrix,
-                              title=""+outputname+"-" + modelname + "",
+                              title="" + outputname + "-" + modelname + "",
                               classes=["predicted", "unknown"])
 
-        with open("../Data/outputs/"+outputname+"-" + modelname + "-" + ".txt", 'w') as f:
+        with open("../Data/outputs3/" + outputname + "-" + modelname + "-" + ".txt", 'w') as f:
             print(classification_report(y2['label'].astype('category').cat.codes, y_pred, ), file=f)

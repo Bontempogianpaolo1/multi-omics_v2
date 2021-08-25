@@ -20,7 +20,7 @@ class BNN(nn.Module):
         self.softplus = torch.nn.Softplus()
         self.optim = Adam({"lr": 0.01})
         self.num_features = input_size
-        self.num_iterations = 100
+        self.num_iterations = 200
         self.num_samples=100
 
     def forward(self, x):

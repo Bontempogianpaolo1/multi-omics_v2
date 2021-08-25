@@ -71,7 +71,7 @@ def plot_pareto(max_variance, variance, n_components, title):
     ax2.tick_params(axis="y", colors="C1")
     ax2.set_ylabel('variance cumulative')
     plt.title(title)
-    plt.savefig("../Data/outputs/paretos/" + title + ".png")
+    plt.savefig("../Data/outputs3/paretos/" + title + ".png")
     plt.show()
 
 
@@ -140,7 +140,7 @@ def pareto_plot(df, title=None, show_pct_y=False, pct_format='{:.1%}'):
     #    plt.title(title)
 
     plt.tight_layout()
-    plt.savefig("../Data/outputs/paretos/" + title + ".png")
+    plt.savefig("../Data/outputs3/paretos/" + title + ".png")
     plt.show()
 
 
@@ -178,7 +178,7 @@ def plot_confusion_matrix(cm, classes,
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
     plt.tight_layout()
-    plt.savefig("../Data/outputs/" + title + ".png")
+    plt.savefig("../Data/outputs3/" + title + ".png")
     plt.pause(0.2)
 
 
@@ -305,7 +305,7 @@ def plot_outliers(X, y, X_train, title):
         ax.scatter(X_train[:, 0], X_train[:, 1], X_train[:, 2], c=c, marker=m, label='train-set without outliers')
     ax.legend(loc='upper left', fontsize=12)
     plt.title(title)
-    plt.savefig("../Data/outputs/" + title + ".png")
+    plt.savefig("../Data/outputs3/" + title + ".png")
     plt.pause(0.2)
 
 
@@ -327,7 +327,7 @@ def plot_sets(multi_names, multi_values, data, filenames, modelname, multi_y_pre
     }
     result2 = result.copy()
     result2.get("multi").intersection(result2.get(filenames[0]))
-    with open("../Data/outputs/without-unknown-testset-withweigths-" + modelname + "-probabilities.txt", 'w') as f:
+    with open("../Data/outputs3/without-unknown-testset-withweigths-" + modelname + "-probabilities.txt", 'w') as f:
         for name1, name2, name3 in itertools.combinations_with_replacement(filenames, 3):
             title = "relazione multi-" + name1 + "-" + name2 + "-" + name3 + "-modello-" + modelname
             print(title, file=f)
@@ -387,7 +387,7 @@ def plot_sets(multi_names, multi_values, data, filenames, modelname, multi_y_pre
     # venn(result)
     plt.plot()
     title = "set-theory" + modelname
-    plt.savefig("../Data/outputs/" + title + ".png")
+    plt.savefig("../Data/outputs3/" + title + ".png")
     plt.pause(0.2)
     return
 
@@ -442,16 +442,16 @@ def plot_misclassified(intersection, y_pred, name, title):
         #    ax.scatter(x_train[:, 0], x_train[:, 1], x_train[:, 2], c=c, marker=m, label='train-set without outliers')
         ax.legend(loc='upper left', fontsize=12)
         plt.title(title2)
-        plt.savefig("../Data/outputs/UMAP-2d-" + title2 + ".png")
+        plt.savefig("../Data/outputs3/UMAP-2d-" + title2 + ".png")
         plt.pause(0.2)
     return
 
 
 def PlotInstograms(df: pd.DataFrame,title):
     df2=df.copy()
-    df2['max_probability']=round(df['max_probability'],2)
+    df2['max_probability']=round(df['max_probability'],1)
     sns.catplot(x="max_probability", kind="count", data=df2)
     plt.title(title)
-    plt.savefig("../Data/outputs/" + title + ".png")
+    plt.savefig("../Data/outputs3/" + title + ".png")
     plt.show()
 
